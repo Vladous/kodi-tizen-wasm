@@ -32,7 +32,6 @@
     __syscall_sendmsg: 'sendmsg',
     __syscall_recvmsg: 'recvmsg',
     __syscall_getsockopt: 'getsockopt',
-    __syscall_setsockopt: 'setsockopt',
     __syscall_shutdown: 'shutdown',
     __syscall_poll: 'poll',
     __syscall_poll_nonblocking: 'poll_nonblocking',
@@ -871,11 +870,13 @@ addToLibrary({
     return TizenSockets.getsockopt(fd, n, level, optname, optval, optlen);
   },
 
-  __syscall_setsockopt__deps: ['$TizenSockets', 'kodi_upstream_setsockopt'],
-  __syscall_setsockopt__proxy: 'none',
-  __syscall_setsockopt: (fd, level, optname, optval, optlen, unused) => {
+  // Called by __syscall_setsockopt in TizenSockets.c: Emscripten defines that one in C.
+  kodi_tizen_setsockopt__deps: ['$TizenSockets'],
+  kodi_tizen_setsockopt__proxy: 'none',
+  kodi_tizen_setsockopt__sig: 'iiiipp',
+  kodi_tizen_setsockopt: (fd, level, optname, optval, optlen) => {
     const n = TizenSockets.native(fd);
-    if (n < 0) return _kodi_upstream_setsockopt(fd, level, optname, optval, optlen);
+    if (n < 0) return -{{{ cDefs.ENOPROTOOPT }}};
     return TizenSockets.setsockopt(fd, n, level, optname, optval, optlen);
   },
 

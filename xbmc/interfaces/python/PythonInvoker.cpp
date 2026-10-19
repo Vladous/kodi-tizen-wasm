@@ -676,12 +676,33 @@ void CPythonInvoker::onInitialization()
   // In a browser, urllib3 (and so requests) switches to its backend for Pyodide, which
   // needs Pyodide's js module. This Python has sockets of its own, which urllib3 uses
   // as everywhere else once that backend is left out.
-  static constexpr const char* WASM_INIT = "import sys, types\n"
-                                           "_m = types.ModuleType('urllib3.contrib.emscripten')\n"
-                                           "_m.inject_into_urllib3 = lambda: None\n"
-                                           "_m.extract_from_urllib3 = lambda: None\n"
-                                           "sys.modules['urllib3.contrib.emscripten'] = _m\n"
-                                           "del _m\n";
+  //
+  // Native extension modules cannot be loaded either. For a .so or .pyd file importlib
+  // finds no loader at all and returns None, which add-ons that try a native module
+  // first do not expect; with a loader that fails with ImportError they fall back to
+  // their pure Python code, as on any platform that has no such module.
+  static constexpr const char* WASM_INIT =
+      "import sys, types\n"
+      "_m = types.ModuleType('urllib3.contrib.emscripten')\n"
+      "_m.inject_into_urllib3 = lambda: None\n"
+      "_m.extract_from_urllib3 = lambda: None\n"
+      "sys.modules['urllib3.contrib.emscripten'] = _m\n"
+      "del _m\n"
+      "import importlib._bootstrap_external as _be\n"
+      "if not getattr(_be, '_kodi_no_native', False):\n"
+      "  class _NativeLoader:\n"
+      "    def __init__(self, name, path):\n"
+      "      self.name, self.path = name, path\n"
+      "    def create_module(self, spec):\n"
+      "      raise ImportError('native modules cannot be loaded here: ' + self.path,\n"
+      "                        name=self.name, path=self.path)\n"
+      "    def exec_module(self, module):\n"
+      "      pass\n"
+      "  _be._get_supported_file_loaders = (lambda _l=_be._get_supported_file_loaders,\n"
+      "    _n=_NativeLoader: _l() + [(_n, ['.so', '.pyd'])])\n"
+      "  del _NativeLoader\n"
+      "  _be._kodi_no_native = True\n"
+      "del _be\n";
   if (PyRun_SimpleString(WASM_INIT) == -1)
     CLog::Log(LOGERROR, "CPythonInvoker({}, {}): WASM initialization failed", GetId(),
               m_sourceFile);

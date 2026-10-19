@@ -34,6 +34,16 @@ static struct kodi_sock_entry g_sockets[KODI_SOCK_MAX_FD];
 static _Atomic int32_t g_availability;
 
 extern int kodi_tizen_sockets_probe(void);
+extern int kodi_tizen_setsockopt(int fd, int level, int optname, intptr_t optval, size_t optlen);
+
+/* Emscripten defines setsockopt as a weak C stub that fails every call, and a symbol
+ * defined in C wins over one from a JS library, so the call is handed on from here.
+ * Python's socket module, and so urllib3, gives up on a connection when it fails. */
+int __syscall_setsockopt(int fd, int level, int optname, intptr_t optval, size_t optlen, int dummy)
+{
+  (void)dummy;
+  return kodi_tizen_setsockopt(fd, level, optname, optval, optlen);
+}
 
 EMSCRIPTEN_KEEPALIVE void* kodi_sock_table(void)
 {
