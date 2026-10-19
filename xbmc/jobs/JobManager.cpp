@@ -455,7 +455,13 @@ unsigned int CJobManager::GetMaxWorkers(CJob::PRIORITY priority)
   if (priority == CJob::PRIORITY_LOW_PAUSABLE)
     return GetMaxPausableWorkers();
 
+#if defined(TARGET_WASM)
+  // Every thread is a web worker with its own copy of the runtime, and a TV kills the
+  // app when it runs short of memory, so fewer jobs run at the same time.
+  static const unsigned int max_workers = 3;
+#else
   static const unsigned int max_workers = 5;
+#endif
   return max_workers - (CJob::PRIORITY_HIGH - priority);
 }
 
@@ -467,7 +473,11 @@ unsigned int CJobManager::GetMaxPausableWorkers()
 
   // hardware_concurrency() rather than CCPUInfo, to keep the job manager free of the service
   // broker. It reports 0 when it cannot tell, which counts as "not many".
+#if defined(TARGET_WASM)
+  return 1;
+#else
   return std::thread::hardware_concurrency() >= 4 ? SOURCE_REQUEST_LIMIT : SMALL_DEVICE_LIMIT;
+#endif
 }
 
 bool CJobManager::CanStart(CJob::PRIORITY priority) const

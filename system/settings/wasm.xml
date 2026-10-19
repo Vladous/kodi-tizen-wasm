@@ -27,5 +27,13 @@
         </setting>
       </group>
     </category>
+    <category id="filecache">
+      <group id="1">
+        <!-- The whole cache is in memory, which a TV is short of when a video starts. -->
+        <setting id="filecache.memorysize">
+          <default>20</default>
+        </setting>
+      </group>
+    </category>
   </section>
 </settings>

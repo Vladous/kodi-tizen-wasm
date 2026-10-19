@@ -384,7 +384,13 @@ void CAdvancedSettings::Initialize()
   m_playlistAsFolders = true;
   m_detectAsUdf = false;
 
+#if defined(TARGET_WASM)
+  // A fanart texture of 1080 lines takes 8 MB of the memory a TV shares with its video
+  // decoder, so they are kept at 720 lines.
+  m_fanartRes = 720;
+#else
   m_fanartRes = 1080;
+#endif
   m_imageRes = 720;
   m_imageScalingAlgorithm = CPictureScalingAlgorithm::Default;
   m_imageQualityJpeg = 4;

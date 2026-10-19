@@ -206,8 +206,35 @@
   // Kodi pthread); nothing else may take a rendering context on it.
   kodi.canvas = canvas;
 
+  // A thread that ends leaves its web worker idle for the next thread, and Emscripten
+  // never ends one. Each holds about 6 MB, so Kodi, add-ons that start threads and
+  // every plugin call would pile them up until a TV runs short of memory, which kills
+  // the app. Only a few are kept; a new thread gets a fresh worker.
+  var IDLE_WORKERS_KEPT = 2;
+  function trimIdleWorkers() {
+    while (PThread.unusedWorkers.length > IDLE_WORKERS_KEPT) {
+      PThread.unusedWorkers.shift().terminate();
+    }
+  }
+  function limitIdleWorkers() {
+    if (typeof PThread === 'undefined' || !PThread.returnWorkerToPool) {
+      return;
+    }
+    var returnWorkerToPool = PThread.returnWorkerToPool;
+    PThread.returnWorkerToPool = function (worker) {
+      returnWorkerToPool.call(PThread, worker);
+      trimIdleWorkers();
+    };
+    trimIdleWorkers();
+  }
+
   var prevOnRuntime = Module.onRuntimeInitialized;
   Module.onRuntimeInitialized = function () {
+    try {
+      limitIdleWorkers();
+    } catch (e) {
+      console.warn('[kodi] idle worker limit:', e);
+    }
     // Must run on the browser main thread (document is undefined on pthread workers).
     document.addEventListener(
         'paste',
