@@ -1,0 +1,210 @@
+Make the device type of pairing a setting
+
+The add-on pairs the account as "androidportable", which some subscriptions
+do not include (https://github.com/palinek/pvr.sledovanitv.cz/issues/124);
+"xbmc", "androidtv" and "ios" are accepted by the API as well. The default
+stays "androidportable".
+
+diff --git a/pvr.sledovanitv.cz/addon.xml.in b/pvr.sledovanitv.cz/addon.xml.in
+index 32ab2b0..d0bf991 100644
+--- a/pvr.sledovanitv.cz/addon.xml.in
++++ b/pvr.sledovanitv.cz/addon.xml.in
+@@ -1,7 +1,7 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <addon
+   id="pvr.sledovanitv.cz"
+-  version="22.6.1"
++  version="22.6.1.1"
+   name="Sledovanitv.cz Client (unofficial)"
+   provider-name="palinek">
+   <requires>@ADDON_DEPENDS@
+diff --git a/pvr.sledovanitv.cz/resources/instance-settings.xml b/pvr.sledovanitv.cz/resources/instance-settings.xml
+index 9dd76f4..29d3e02 100644
+--- a/pvr.sledovanitv.cz/resources/instance-settings.xml
++++ b/pvr.sledovanitv.cz/resources/instance-settings.xml
+@@ -58,6 +58,19 @@
+           </constraints>
+           <control type="edit" format="string" />
+         </setting>
++        <setting id="pairingType" type="string" label="30018" help="30023">
++          <level>1</level>
++          <default>androidportable</default>
++          <constraints>
++            <options>
++              <option label="30019">androidportable</option>
++              <option label="30020">xbmc</option>
++              <option label="30021">androidtv</option>
++              <option label="30022">ios</option>
++            </options>
++          </constraints>
++          <control type="list" format="string" />
++        </setting>
+         <setting id="streamQuality" type="integer" label="30002">
+           <level>1</level>
+           <default>0</default> <!-- StreamQuality_t::SQ_DEFAULT -->
+diff --git a/pvr.sledovanitv.cz/resources/language/resource.language.cs_cz/strings.po b/pvr.sledovanitv.cz/resources/language/resource.language.cs_cz/strings.po
+index f8b15fc..ed36e7b 100644
+--- a/pvr.sledovanitv.cz/resources/language/resource.language.cs_cz/strings.po
++++ b/pvr.sledovanitv.cz/resources/language/resource.language.cs_cz/strings.po
+@@ -58,6 +58,30 @@ msgctxt "#30016"
+ msgid "HTTP User-Agent (empty - use predefined)"
+ msgstr "HTTP User-Agent (prázdné - použít předdefinováno)"
+ 
++msgctxt "#30018"
++msgid "Device type for pairing"
++msgstr "Typ zařízení pro párování"
++
++msgctxt "#30019"
++msgid "Android (mobile)"
++msgstr "Android (mobil)"
++
++msgctxt "#30020"
++msgid "Kodi"
++msgstr "Kodi"
++
++msgctxt "#30021"
++msgid "Android TV"
++msgstr "Android TV"
++
++msgctxt "#30022"
++msgid "iOS"
++msgstr "iOS"
++
++msgctxt "#30023"
++msgid "The device type the account is paired as. Which types a subscription allows depends on the package. Delete the paired device in the account to pair again with another type."
++msgstr "Typ zařízení, jako které se účet páruje. Které typy předplatné povoluje, záleží na balíčku. Pro spárování s jiným typem smažte spárované zařízení v účtu."
++
+ msgctxt "#30002"
+ msgid "Stream quality"
+ msgstr "Kvalita streamu"
+diff --git a/pvr.sledovanitv.cz/resources/language/resource.language.en_gb/strings.po b/pvr.sledovanitv.cz/resources/language/resource.language.en_gb/strings.po
+index dd28517..b84f80a 100644
+--- a/pvr.sledovanitv.cz/resources/language/resource.language.en_gb/strings.po
++++ b/pvr.sledovanitv.cz/resources/language/resource.language.en_gb/strings.po
+@@ -58,6 +58,30 @@ msgctxt "#30016"
+ msgid "HTTP User-Agent (empty - use predefined)"
+ msgstr "HTTP User-Agent (empty - use predefined)"
+ 
++msgctxt "#30018"
++msgid "Device type for pairing"
++msgstr "Device type for pairing"
++
++msgctxt "#30019"
++msgid "Android (mobile)"
++msgstr "Android (mobile)"
++
++msgctxt "#30020"
++msgid "Kodi"
++msgstr "Kodi"
++
++msgctxt "#30021"
++msgid "Android TV"
++msgstr "Android TV"
++
++msgctxt "#30022"
++msgid "iOS"
++msgstr "iOS"
++
++msgctxt "#30023"
++msgid "The device type the account is paired as. Which types a subscription allows depends on the package. Delete the paired device in the account to pair again with another type."
++msgstr "The device type the account is paired as. Which types a subscription allows depends on the package. Delete the paired device in the account to pair again with another type."
++
+ msgctxt "#30002"
+ msgid "Stream quality"
+ msgstr "Stream quality"
+diff --git a/pvr.sledovanitv.cz/resources/language/resource.language.sk_sk/strings.po b/pvr.sledovanitv.cz/resources/language/resource.language.sk_sk/strings.po
+index c3f604d..4e1ad3b 100644
+--- a/pvr.sledovanitv.cz/resources/language/resource.language.sk_sk/strings.po
++++ b/pvr.sledovanitv.cz/resources/language/resource.language.sk_sk/strings.po
+@@ -58,6 +58,30 @@ msgctxt "#30016"
+ msgid "HTTP User-Agent (empty - use predefined)"
+ msgstr "HTTP User-Agent (prázdne - použiť preddefinované)"
+ 
++msgctxt "#30018"
++msgid "Device type for pairing"
++msgstr "Typ zariadenia pre párovanie"
++
++msgctxt "#30019"
++msgid "Android (mobile)"
++msgstr "Android (mobil)"
++
++msgctxt "#30020"
++msgid "Kodi"
++msgstr "Kodi"
++
++msgctxt "#30021"
++msgid "Android TV"
++msgstr "Android TV"
++
++msgctxt "#30022"
++msgid "iOS"
++msgstr "iOS"
++
++msgctxt "#30023"
++msgid "The device type the account is paired as. Which types a subscription allows depends on the package. Delete the paired device in the account to pair again with another type."
++msgstr "Typ zariadenia, ako ktoré sa účet páruje. Ktoré typy predplatné povoľuje, záleží od balíka. Pre spárovanie s iným typom zmažte spárované zariadenie v účte."
++
+ msgctxt "#30002"
+ msgid "Stream quality"
+ msgstr "Kvalita streamu"
+diff --git a/src/ApiManager.cpp b/src/ApiManager.cpp
+index 9c5c32b..5810dbf 100644
+--- a/src/ApiManager.cpp
++++ b/src/ApiManager.cpp
+@@ -180,6 +180,7 @@ ApiManager::ApiManager(ServiceProvider_t serviceProvider
+     , const std::string & overridenMac
+     , const std::string & product
+     , const std::string & userAgent
++    , const std::string & pairingType
+     , uint64_t instanceNo)
+   : m_serviceProvider{serviceProvider}
+   , m_userName{userName}
+@@ -187,6 +188,7 @@ ApiManager::ApiManager(ServiceProvider_t serviceProvider
+   , m_overridenMac{overridenMac}
+   , m_product{product}
+   , m_userAgent{userAgent.empty() ? generateUserAgent() : userAgent}
++  , m_pairingType{pairingType.empty() ? "androidportable" : pairingType}
+   , m_instanceNo{instanceNo}
+   , m_pinUnlocked{false}
+   , m_sessionId{std::make_shared<std::string>()}
+@@ -326,7 +328,7 @@ bool ApiManager::pairDevice(json & root)
+ 
+     params.emplace_back("username", m_userName);
+     params.emplace_back("password", m_userPassword);
+-    params.emplace_back("type", "androidportable");
++    params.emplace_back("type", m_pairingType);
+     params.emplace_back("serial", m_serial);
+     params.emplace_back("product", product);
+     params.emplace_back("unit", API_UNIT[m_serviceProvider]);
+diff --git a/src/ApiManager.h b/src/ApiManager.h
+index 8ad0f95..8aed0e1 100644
+--- a/src/ApiManager.h
++++ b/src/ApiManager.h
+@@ -66,6 +66,7 @@ public:
+       , const std::string & overridenMac //!< device identifier (value for overriding the MAC address detection)
+       , const std::string & product //!< product identifier (value for overriding the hostname detection)
+       , const std::string & userAgent //!< HTTP header User-Agent (value for overriding the predefined)
++      , const std::string & pairingType //!< device type the account is paired as (empty - androidportable)
+       , uint64_t instanceNo
+       );
+ 
+@@ -111,6 +112,7 @@ private:
+   const std::string m_overridenMac;
+   const std::string m_product;
+   const std::string m_userAgent;
++  const std::string m_pairingType;
+   const uint64_t m_instanceNo;
+   std::string m_serial;
+   std::string m_deviceId;
+diff --git a/src/Data.cpp b/src/Data.cpp
+index c96c176..284091f 100644
+--- a/src/Data.cpp
++++ b/src/Data.cpp
+@@ -106,6 +106,7 @@ Data::Data(const kodi::addon::IInstanceInfo& instance)
+     , GetInstanceSettingString("deviceId")
+     , GetInstanceSettingString("productId")
+     , GetInstanceSettingString("userAgent")
++    , GetInstanceSettingString("pairingType")
+     , instance.GetNumber()
+   }
+ {

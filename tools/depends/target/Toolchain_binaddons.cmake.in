@@ -64,7 +64,7 @@ endif()
 
 # where is the target environment
 if(NOT "@use_toolchain@" STREQUAL "")
-  if("@target_platform@" STREQUAL "webos")
+  if("@target_platform@" STREQUAL "webos" OR "@target_platform@" STREQUAL "tizen")
     list(APPEND CMAKE_FIND_ROOT_PATH @use_toolchain@/@use_host@/sysroot)
   else()
     list(APPEND CMAKE_FIND_ROOT_PATH @use_toolchain@/sysroot/usr)

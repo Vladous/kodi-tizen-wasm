@@ -165,6 +165,9 @@ private:
    * change without the TV's tracks being set up again.
    */
   void SetupBitstreamConverter();
+#if defined(TARGET_TIZEN)
+  void SetVideoColor();
+#endif
 
   /*!
    * \brief Start the TV at the position of the first packet that follows a flush.

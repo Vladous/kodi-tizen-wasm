@@ -19,6 +19,10 @@
 #include "platform/linux/AppParamParserWebOS.h"
 #endif
 
+#ifdef TARGET_TIZEN
+#include "platform/linux/tizen/CrashReport.h"
+#endif
+
 #include <cstdio>
 #include <cstring>
 #include <errno.h>
@@ -56,6 +60,14 @@ int main(int argc, char* argv[])
   sigaction(SIGTERM, &signalHandler, nullptr);
 
   setlocale(LC_NUMERIC, "C");
+
+#ifdef TARGET_TIZEN
+  KODI::PLATFORM::TIZEN::InstallCrashReport();
+  // The launcher signals the app's lifecycle with these, which would end Kodi before the
+  // windowing handles them.
+  signal(SIGUSR1, SIG_IGN);
+  signal(SIGUSR2, SIG_IGN);
+#endif
 
 #ifdef TARGET_WEBOS
   CAppParamParserWebOS appParamParser;

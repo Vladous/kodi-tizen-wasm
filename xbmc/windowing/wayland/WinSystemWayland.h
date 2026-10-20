@@ -103,6 +103,11 @@ public:
   bool MessagePump() override;
 
 protected:
+  /**
+   * Marks the window opaque, so that the compositor can draw it faster
+   */
+  virtual void ApplyOpaqueRegion();
+
   std::unique_ptr<KODI::WINDOWING::IOSScreenSaver> GetOSScreenSaverImpl() override;
   CSizeInt GetBufferSize() const
   {
@@ -194,7 +199,6 @@ private:
   void UpdateBufferScale();
   void ApplyBufferScale();
   void ApplyViewportSizes();
-  void ApplyOpaqueRegion();
   void ApplyWindowGeometry();
   void UpdateTouchDpi();
   void ApplyShellSurfaceState(IShellSurface::StateBitset state);

@@ -649,7 +649,7 @@ private:
 
   std::set<ISubSettings*> m_subSettings;
 
-#if defined(TARGET_WASM)
+#if defined(TARGET_WASM) || defined(TARGET_TIZEN)
   //! What Save(file) wrote last
   mutable std::string m_savedFile;
   mutable std::string m_savedXml;

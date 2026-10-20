@@ -925,6 +925,8 @@ AVDictionary* CDVDDemuxFFmpeg::GetFFMpegOptionsFromInput()
 #ifdef TARGET_WASM
   // Reusing a connection is a feature of FFmpeg's own http protocol.
   av_dict_set(&options, "http_persistent", "0", 0);
+#endif
+#if defined(TARGET_WASM) || defined(TARGET_TIZEN)
   // IPTV providers serve segments under arbitrary names.
   av_dict_set(&options, "extension_picky", "0", 0);
 #endif

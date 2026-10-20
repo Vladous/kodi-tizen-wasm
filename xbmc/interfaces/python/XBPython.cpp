@@ -351,6 +351,11 @@ void XBPython::RegisterPythonMonitorCallBack(XBMCAddon::xbmc::Monitor* pCallback
   XBMC_TRACE;
   std::unique_lock lock(m_vecMonitorCallbackList);
   m_vecMonitorCallbackList.push_back(pCallback);
+
+  // A monitor created after its script was told to abort, such as in a thread the script
+  // starts while it is still starting up, would otherwise wait for an abort forever.
+  if (m_abortedInvokers.contains(pCallback->GetInvokerId()))
+    pCallback->AbortNotify();
 }
 
 void XBPython::UnregisterPythonMonitorCallBack(XBMCAddon::xbmc::Monitor* pCallback)
@@ -554,6 +559,12 @@ void XBPython::NotifyScriptAborting(ILanguageInvoker* invoker)
   if (invoker != NULL)
     invokerId = invoker->GetId();
 
+  if (invokerId >= 0)
+  {
+    std::unique_lock lock(m_vecMonitorCallbackList);
+    m_abortedInvokers.insert(invokerId);
+  }
+
   LOCK_AND_COPY(std::vector<XBMCAddon::xbmc::Monitor*>, tmp, m_vecMonitorCallbackList);
   for (auto& it : tmp)
   {
@@ -567,6 +578,11 @@ void XBPython::NotifyScriptAborting(ILanguageInvoker* invoker)
 
 void XBPython::OnExecutionEnded(ILanguageInvoker* invoker)
 {
+  {
+    std::unique_lock lock(m_vecMonitorCallbackList);
+    m_abortedInvokers.erase(invoker->GetId());
+  }
+
   std::unique_lock lock(m_vecPyList);
   PyList::iterator it = m_vecPyList.begin();
   while (it != m_vecPyList.end())

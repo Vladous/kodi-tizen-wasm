@@ -24,7 +24,7 @@ if("webos" IN_LIST CORE_PLATFORM_NAME_LC)
     list(APPEND HEADERS VideoBufferStarfish.h)
 endif()
 
-if(CORE_SYSTEM_NAME STREQUAL wasm)
+if(CORE_SYSTEM_NAME STREQUAL wasm OR TARGET_TIZEN)
   list(APPEND HEADERS VideoBufferTizen.h)
 endif()
 

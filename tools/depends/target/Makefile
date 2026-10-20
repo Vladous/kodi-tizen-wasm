@@ -131,6 +131,15 @@ ifeq ($(OS),linux)
     EXCLUDED_DEPENDS += dbus mtdev libevdev libinput linux-system-x11-libs pipewire mesa
   endif
 
+  # The TV has the graphics and sound libraries, Kodi only builds what it links against.
+  ifeq ($(TARGET_PLATFORM),tizen)
+    DEPENDS += tizen-system-libs wayland waylandpp wayland-protocols
+    WAYLANDPP_DEPS += tizen-system-libs
+    # Kodi plays SMB shares through libsmb2 there, as in the WASM build.
+    EXCLUDED_DEPENDS += dbus mtdev libevdev libinput linux-system-x11-libs pipewire mesa alsa-lib \
+                        samba samba-gplv3
+  endif
+
   ifneq (,$(findstring gbm,$(TARGET_PLATFORM)))
     DEPENDS += hwdata libdisplay-info
   endif
@@ -141,7 +150,7 @@ DEPENDS := $(filter-out $(EXCLUDED_DEPENDS),$(DEPENDS))
 
 all: .installed-$(PLATFORM)
 
-EXCLUDE := linux-system-gl-libs linux-system-x11-libs
+EXCLUDE := linux-system-gl-libs linux-system-x11-libs tizen-system-libs
 DOWNLOAD_DEPS := $(filter-out $(EXCLUDE:%=%), $(DEPENDS))
 DOWNLOAD_TARGETS := $(addprefix download/, $(DOWNLOAD_DEPS))
 
@@ -252,6 +261,16 @@ linux-system-x11-libs:
 	[ -f $(PREFIX)/lib/pkgconfig/ice.pc ] || ln -sf $(HOST_LIB_PKGCONFIG)/ice.pc $(PREFIX)/lib/pkgconfig/ice.pc
 	[ -f $(PREFIX)/lib/pkgconfig/sm.pc ] || ln -sf $(HOST_LIB_PKGCONFIG)/sm.pc $(PREFIX)/lib/pkgconfig/sm.pc
 	[ -f $(PREFIX)/lib/pkgconfig/xmu.pc ] || ln -sf $(HOST_LIB_PKGCONFIG)/xmu.pc $(PREFIX)/lib/pkgconfig/xmu.pc
+
+# The TV's graphics and sound libraries, in the toolchain's sysroot (by full path, so that
+# the sysroot's own copies of what Kodi builds itself are not linked)
+TIZEN_SYSROOT_LIB := $(TOOLCHAIN)/$(HOST)/sysroot/usr/lib
+tizen-system-libs:
+	mkdir -p $(PREFIX)/lib/pkgconfig
+	printf 'Name: egl\nDescription: EGL of the TV\nVersion: 1.5\nLibs: $(TIZEN_SYSROOT_LIB)/libEGL.so\nCflags:\n' > $(PREFIX)/lib/pkgconfig/egl.pc
+	printf 'Name: glesv2\nDescription: OpenGL ES of the TV\nVersion: 3.2\nLibs: $(TIZEN_SYSROOT_LIB)/libGLESv2.so\nCflags:\n' > $(PREFIX)/lib/pkgconfig/glesv2.pc
+	printf 'Name: libpulse\nDescription: PulseAudio of the TV\nVersion: 15.0\nLibs: $(TIZEN_SYSROOT_LIB)/libpulse.so\nCflags: -D_REENTRANT\n' > $(PREFIX)/lib/pkgconfig/libpulse.pc
+	printf 'Name: libpulse-simple\nDescription: PulseAudio of the TV\nVersion: 15.0\nRequires: libpulse\nLibs: $(TIZEN_SYSROOT_LIB)/libpulse-simple.so\nCflags: -D_REENTRANT\n' > $(PREFIX)/lib/pkgconfig/libpulse-simple.pc
 
 linux-system-gl-libs:
 	mkdir -p $(PREFIX)/lib/pkgconfig

@@ -244,6 +244,9 @@ private:
 #ifdef TARGET_WASM
   void WasmRunIteration();
 #endif
+#if defined(TARGET_WASM) || defined(TARGET_TIZEN)
+  void SaveSettingsRegularly();
+#endif
 
   mutable CCriticalSection m_critSection; /*!< critical section for all changes to this class, except for changes to triggers */
 

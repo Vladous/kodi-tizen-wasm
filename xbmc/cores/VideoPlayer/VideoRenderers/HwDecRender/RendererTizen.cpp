@@ -16,7 +16,9 @@
 
 #include <cmath>
 
+#ifdef TARGET_WASM
 #include <emscripten/html5.h>
+#endif
 
 CBaseRenderer* CRendererTizen::Create(CVideoBuffer* buffer)
 {
@@ -64,6 +66,7 @@ void CRendererTizen::ManageRenderArea()
   if (m_exportedDestRect == m_destRect || m_destRect.IsEmpty())
     return;
 
+#ifdef TARGET_WASM
   // The video element is positioned in CSS pixels, the destination is in canvas pixels.
   int canvasWidth = 0;
   int canvasHeight = 0;
@@ -82,6 +85,13 @@ void CRendererTizen::ManageRenderArea()
                       static_cast<int>(std::lround(m_destRect.y1 * scaleY)),
                       static_cast<int>(std::lround(m_destRect.Width() * scaleX)),
                       static_cast<int>(std::lround(m_destRect.Height() * scaleY)));
+#else
+  // The video plane is positioned in the pixels of Kodi's window.
+  tizen_emss_set_rect(static_cast<int>(std::lround(m_destRect.x1)),
+                      static_cast<int>(std::lround(m_destRect.y1)),
+                      static_cast<int>(std::lround(m_destRect.Width())),
+                      static_cast<int>(std::lround(m_destRect.Height())));
+#endif
   m_exportedDestRect = m_destRect;
 }
 

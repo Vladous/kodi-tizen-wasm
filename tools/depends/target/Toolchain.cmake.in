@@ -16,7 +16,7 @@ if(OS STREQUAL linux)
     set(CORE_PLATFORM_NAME "@target_platform@")
   endif()
   set(APP_RENDER_SYSTEM @app_rendersystem@ CACHE STRING "Render system to use: \"gl\" or \"gles\"")
-  if(PLATFORM STREQUAL webos)
+  if(PLATFORM STREQUAL webos OR PLATFORM STREQUAL tizen)
     set(TOOLCHAIN @use_toolchain@)
     set(HOST @use_host@)
   endif()
@@ -99,7 +99,7 @@ endif()
 if(NOT "@use_toolchain@" STREQUAL "")
   list(APPEND CMAKE_FIND_ROOT_PATH @use_toolchain@/@use_host@ @use_toolchain@/@use_host@/sysroot @use_toolchain@/@use_host@/sysroot/usr @use_toolchain@/@use_host@/libc @use_toolchain@/lib/@use_host@/sysroot @use_toolchain@/sysroot/usr)
 
-  if (OS STREQUAL linux AND NOT PLATFORM STREQUAL webos)
+  if (OS STREQUAL linux AND NOT PLATFORM STREQUAL webos AND NOT PLATFORM STREQUAL tizen)
     # Explicitly set this as last. This potentially is /usr which can then cause linux
     # cross compilation to search paths that are not relevant to target arch (eg host libs)
     # x86/x86_64 jenkins CI jobs require /usr for libs like iconv

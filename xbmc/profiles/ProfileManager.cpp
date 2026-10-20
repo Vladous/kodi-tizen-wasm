@@ -237,8 +237,8 @@ bool CProfileManager::Save() const
   for (const auto& profile : m_profiles)
     profile.Save(pRoot);
 
-#if defined(TARGET_WASM)
-  // Saved with the settings over and over (see CApplication::WasmRunIteration()), so the
+#if defined(TARGET_WASM) || defined(TARGET_TIZEN)
+  // Saved with the settings over and over (see CApplication::SaveSettingsRegularly()), so the
   // file is only written when something has changed.
   TiXmlPrinter printer;
   xmlDoc.Accept(&printer);

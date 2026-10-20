@@ -162,8 +162,8 @@ bool CSettings::Save(const std::string& file) const
   if (!Save(root))
     return false;
 
-#if defined(TARGET_WASM)
-  // Saved over and over (see CApplication::WasmRunIteration()), so the file is only
+#if defined(TARGET_WASM) || defined(TARGET_TIZEN)
+  // Saved over and over (see CApplication::SaveSettingsRegularly()), so the file is only
   // written when something has changed.
   TiXmlPrinter printer;
   xmlDoc.Accept(&printer);

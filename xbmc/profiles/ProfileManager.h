@@ -215,7 +215,7 @@ private:
   int m_nextProfileId{
       MASTER_PROFILE_ID}; // for tracking the next available id to give to a new profile to ensure id's are not re-used
   mutable CCriticalSection m_critical;
-#if defined(TARGET_WASM)
+#if defined(TARGET_WASM) || defined(TARGET_TIZEN)
   //! What Save() wrote last
   mutable std::string m_savedXml;
 #endif

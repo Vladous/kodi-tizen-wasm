@@ -1,0 +1,34 @@
+# Binary add-ons of the repository for Tizen TVs, by their ids in cmake/addons/addons.
+# Kodi on a TV comes with pvr.iptvsimple, inputstream.adaptive and inputstream.ffmpegdirect;
+# the repository has newer versions of them as well.
+inputstream.adaptive
+inputstream.ffmpegdirect
+inputstream.rtmp
+pvr.argustv
+pvr.demo
+pvr.dvblink
+pvr.dvbviewer
+pvr.filmon
+pvr.freebox
+pvr.hdhomerun
+pvr.hts
+pvr.iptvsimple
+pvr.mediaportal.tvserver
+pvr.mythtv
+pvr.nextpvr
+pvr.njoy
+pvr.octonet
+pvr.pctv
+pvr.plutotv
+pvr.sledovanitv.cz
+pvr.stalker
+pvr.teleboy
+pvr.vbox
+pvr.vdr.vnsi
+pvr.vuplus
+pvr.waipu
+pvr.wmc
+pvr.zattoo
+vfs.libarchive
+vfs.rar
+vfs.sftp

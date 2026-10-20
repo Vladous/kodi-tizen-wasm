@@ -47,6 +47,10 @@ COutput::COutput(std::uint32_t globalName,
     // std::set.emplace returns pair of iterator to the (possibly) inserted
     // element and boolean information whether the element was actually added
     // which we do not need
+    // The compositor of Samsung's TVs sends the refresh rate in Hz instead of mHz, and
+    // no display refreshes less than once a second.
+    if (refresh > 0 && refresh < 1000)
+      refresh *= 1000;
     auto modeIterator = m_modes.emplace(CSizeInt{width, height}, refresh).first;
     std::unique_lock lock(m_iteratorCriticalSection);
     // Remember current and preferred mode

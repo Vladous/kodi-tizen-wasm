@@ -342,7 +342,10 @@ bool CMediaPipelineTizen::OpenAudioStream(CDVDStreamInfo hint)
     if (!changed)
       return true;
 
-    // The TV cannot reconfigure a track of a source that is open.
+    // The TV cannot reconfigure a track of a source that is open. The packets queued for
+    // the old one are from before the seek that follows a change of stream, and would
+    // make the new one start there.
+    Flush(false);
     Unload();
   }
 
@@ -380,6 +383,7 @@ bool CMediaPipelineTizen::OpenVideoStream(CDVDStreamInfo hint)
       return true;
     }
 
+    Flush(false);
     Unload();
   }
 
@@ -388,6 +392,68 @@ bool CMediaPipelineTizen::OpenVideoStream(CDVDStreamInfo hint)
     return Load();
   return true;
 }
+
+#if defined(TARGET_TIZEN)
+void CMediaPipelineTizen::SetVideoColor()
+{
+  // The TV's player shows HDR video as such when it is told, as browsers do from the
+  // stream's container. Streams without colour information leave the TV to its defaults.
+  const auto& hint = m_videoHint;
+  const bool hdr = hint.colorTransferCharacteristic == AVCOL_TRC_SMPTE2084 ||
+                   hint.colorTransferCharacteristic == AVCOL_TRC_ARIB_STD_B67 ||
+                   hint.colorPrimaries == AVCOL_PRI_BT2020 || hint.masteringMetadata ||
+                   hint.contentLightMetadata;
+  if (!hdr)
+  {
+    tizen_emss_set_video_color(nullptr);
+    return;
+  }
+
+  TizenEmssVideoColor color{};
+  color.matrixCoefficients = static_cast<uint32_t>(hint.colorSpace);
+  // Kodi counts the bits of all three channels, and HDR has at least 10 bits per channel.
+  color.bitsPerChannel = std::max(10, hint.bitsperpixel / 3);
+  // 4:2:0, as the TV decodes
+  color.chromaSubsamplingHorizontal = 1;
+  color.chromaSubsamplingVertical = 1;
+  color.cbSubsamplingHorizontal = 1;
+  color.cbSubsamplingVertical = 1;
+  color.range = static_cast<uint32_t>(hint.colorRange);
+  color.transferCharacteristics = static_cast<uint32_t>(hint.colorTransferCharacteristic);
+  color.primaries = static_cast<uint32_t>(hint.colorPrimaries);
+  if (const auto& light = hint.contentLightMetadata)
+  {
+    color.maxCll = light->MaxCLL;
+    color.maxFall = light->MaxFALL;
+  }
+  if (const auto& mastering = hint.masteringMetadata)
+  {
+    if (mastering->has_primaries)
+    {
+      color.primaryRX = av_q2d(mastering->display_primaries[0][0]);
+      color.primaryRY = av_q2d(mastering->display_primaries[0][1]);
+      color.primaryGX = av_q2d(mastering->display_primaries[1][0]);
+      color.primaryGY = av_q2d(mastering->display_primaries[1][1]);
+      color.primaryBX = av_q2d(mastering->display_primaries[2][0]);
+      color.primaryBY = av_q2d(mastering->display_primaries[2][1]);
+      color.whitePointX = av_q2d(mastering->white_point[0]);
+      color.whitePointY = av_q2d(mastering->white_point[1]);
+    }
+    if (mastering->has_luminance)
+    {
+      color.luminanceMax = av_q2d(mastering->max_luminance);
+      color.luminanceMin = av_q2d(mastering->min_luminance);
+    }
+  }
+  CLog::LogF(LOGINFO,
+             "HDR video: transfer {} primaries {} matrix {} range {}, {} bit, MaxCLL {} MaxFALL {}, "
+             "mastering {:.4f}-{:.1f} nits",
+             color.transferCharacteristics, color.primaries, color.matrixCoefficients, color.range,
+             color.bitsPerChannel, color.maxCll, color.maxFall, color.luminanceMin,
+             color.luminanceMax);
+  tizen_emss_set_video_color(&color);
+}
+#endif
 
 void CMediaPipelineTizen::SetupBitstreamConverter()
 {
@@ -694,6 +760,9 @@ bool CMediaPipelineTizen::Load()
     if (!tizen_drm_usable_key_id(DrmSession(m_audioHint), m_audioClearLeadKey.data()))
       m_audioClearLeadKey.clear();
   }
+#if defined(TARGET_TIZEN)
+  SetVideoColor();
+#endif
   if (!tizen_emss_open(&m_state, &config))
   {
     CLog::LogF(LOGERROR, "The Tizen WASM Player did not open");

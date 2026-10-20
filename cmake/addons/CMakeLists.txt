@@ -430,6 +430,24 @@ foreach(addon ${addons})
           endif()
 
           set(SOURCE_DIR ${BUILD_DIR}/${id})
+
+          # apply the patches given for the addon, such as fixes not released upstream yet
+          if(ADDON_PATCH_DIR)
+            file(GLOB addon_patches ${ADDON_PATCH_DIR}/${id}/*.patch)
+            list(SORT addon_patches)
+            if(addon_patches)
+              find_program(PATCH_EXECUTABLE NAMES patch REQUIRED)
+            endif()
+            foreach(addon_patch ${addon_patches})
+              message(STATUS "${id}: applying ${addon_patch}")
+              execute_process(COMMAND ${PATCH_EXECUTABLE} -p1 -i ${addon_patch}
+                              WORKING_DIRECTORY ${SOURCE_DIR}
+                              RESULT_VARIABLE patch_result)
+              if(NOT patch_result EQUAL 0)
+                message(FATAL_ERROR "${id}: ${addon_patch} does not apply")
+              endif()
+            endforeach()
+          endif()
         endif()
 
         if(NOT "${SOURCE_DIR}" STREQUAL "" AND EXISTS ${SOURCE_DIR})

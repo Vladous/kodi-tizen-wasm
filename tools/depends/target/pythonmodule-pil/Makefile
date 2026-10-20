@@ -89,7 +89,7 @@ ifeq ($(OS),android)
                           -e "s/\.*with.*joinpath('\(.*\)').*/__file__ = os.path.join(os.environ[\"KODI_ANDROID_LIBS\"], '\1')/" \
                           -e 's/^        /    /' \
                               _imaging*.py
-else ifeq ($(TARGET_PLATFORM),webos)
+else ifneq (,$(filter webos tizen,$(TARGET_PLATFORM)))
 	unzip -o $(PLATFORM)/dist/pillow-*.egg -d $(PILPATH)
 endif
 	touch $@

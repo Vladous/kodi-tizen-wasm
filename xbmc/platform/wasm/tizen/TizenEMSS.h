@@ -77,6 +77,39 @@ static_assert(offsetof(TizenEmssConfig, hasAudio) == 36, "TizenEmssConfig layout
 static_assert(offsetof(TizenEmssConfig, sampleRate) == 60,
               "TizenEmssConfig layout is shared with JS");
 
+/*!
+ * \brief Colour and HDR information of a video stream, in the codes of Matroska's Colour
+ * element (ISO/IEC 23091-4, as FFmpeg's), for tizen_emss_set_video_color().
+ *
+ * The layout is that of the TV's player.
+ */
+struct TizenEmssVideoColor
+{
+  uint32_t matrixCoefficients;
+  uint32_t bitsPerChannel;
+  uint32_t chromaSubsamplingHorizontal;
+  uint32_t chromaSubsamplingVertical;
+  uint32_t cbSubsamplingHorizontal;
+  uint32_t cbSubsamplingVertical;
+  uint32_t chromaSitingHorizontal;
+  uint32_t chromaSitingVertical;
+  uint32_t range;
+  uint32_t transferCharacteristics;
+  uint32_t primaries;
+  uint32_t maxCll;
+  uint32_t maxFall;
+  double primaryRX;
+  double primaryRY;
+  double primaryGX;
+  double primaryGY;
+  double primaryBX;
+  double primaryBY;
+  double whitePointX;
+  double whitePointY;
+  double luminanceMax;
+  double luminanceMin;
+};
+
 enum TizenEmssAppendResult : int
 {
   TIZEN_EMSS_APPEND_OK = 0,
@@ -95,6 +128,12 @@ int tizen_emss_validate_audio(const char* mime,
                               const char* channelLayout,
                               int sampleRate);
 int tizen_emss_open(TizenEmssState* state, const TizenEmssConfig* config);
+
+/*!
+ * \brief Colour information for the video of the next tizen_emss_open(), nullptr for none.
+ * Native builds only: a browser's player reads it from the stream.
+ */
+void tizen_emss_set_video_color(const TizenEmssVideoColor* color);
 
 /*!
  * \brief Size and frame rate of a video packet, which the TV reads from every one.

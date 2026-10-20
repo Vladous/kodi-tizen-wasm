@@ -222,11 +222,15 @@ cmake_install.cmake
 /tools/depends/target/Toolchain_binaddons.cmake
 /tools/depends/target/config-binaddons.site
 /tools/depends/target/binary-addons/native
+/tools/depends/target/binary-addons/tizen-repository
 
 # /tools/EventClients/
 /tools/EventClients/*.pyc
 /tools/EventClients/Makefile
 /tools/EventClients/Clients/WiiRemote/WiiRemote
+
+# /tools/tizen/
+!/tools/tizen/toolchain/stubs/*.symbols
 
 # /tools/darwin/
 /tools/darwin/packaging/darwin_embedded/mkdeb-darwin_embedded.sh

@@ -11,6 +11,8 @@
 #include "WinSystemWayland.h"
 #ifdef TARGET_WEBOS
 #include "WinSystemWaylandWebOS.h"
+#elif defined(TARGET_TIZEN)
+#include "WinSystemWaylandTizen.h"
 #endif
 #include "utils/EGLUtils.h"
 #include "windowing/linux/WinSystemEGL.h"
@@ -26,6 +28,8 @@ namespace WAYLAND
 
 #ifdef TARGET_WEBOS
 using CWinSystemWaylandImpl = CWinSystemWaylandWebOS;
+#elif defined(TARGET_TIZEN)
+using CWinSystemWaylandImpl = CWinSystemWaylandTizen;
 #else
 using CWinSystemWaylandImpl = CWinSystemWayland;
 #endif

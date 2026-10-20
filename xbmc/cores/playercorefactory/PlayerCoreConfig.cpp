@@ -20,6 +20,9 @@
 #include "VideoPlayerTizen.h"
 #include "platform/wasm/player/WebPlayer.h"
 #endif
+#ifdef TARGET_TIZEN
+#include "VideoPlayerTizen.h"
+#endif
 #ifdef TARGET_WEBOS
 #include "VideoPlayerWebOS.h"
 #endif
@@ -55,7 +58,7 @@ std::shared_ptr<IPlayer> CPlayerCoreConfig::CreatePlayer(IPlayerCallback& callba
   {
 #if defined(TARGET_WEBOS)
     player = std::make_shared<CVideoPlayerWebOS>(callback);
-#elif defined(TARGET_WASM)
+#elif defined(TARGET_WASM) || defined(TARGET_TIZEN)
     player = std::make_shared<CVideoPlayerTizen>(callback);
 #else
     player = std::make_shared<CVideoPlayer>(callback);

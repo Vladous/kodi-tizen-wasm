@@ -21,6 +21,14 @@ ifeq ($(CROSS_COMPILING), yes)
 	CONFIGURE += --cross-file $(PREFIX)/share/cross-file.meson
 endif
 
+# Kodi links the TV's libwayland-client, which its EGL uses as well: one copy for both.
+# The shared libraries built here are only linked against, not packaged.
+ifeq ($(TARGET_PLATFORM),tizen)
+	CONFIGURE += -Ddefault_library=shared
+	# The TV's library does not export libffi either, Kodi has to link its own.
+	CONFIGURE += "-Dc_link_args=['-L$(PREFIX)/lib', '-Wl,--exclude-libs,libffi.a']"
+endif
+
 export CC
 export CXX
 export CFLAGS

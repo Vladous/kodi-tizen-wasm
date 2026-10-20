@@ -194,7 +194,10 @@ void CUDevProvider::GetDisks(std::vector<CMediaSource>& disks, bool removable)
 
 void CUDevProvider::GetLocalDrives(std::vector<CMediaSource>& localDrives)
 {
+  // The partitions of a TV are its own, only its USB drives are of use
+#if !defined(TARGET_TIZEN)
   GetDisks(localDrives, false);
+#endif
 }
 
 void CUDevProvider::GetRemovableDrives(std::vector<CMediaSource>& removableDrives)

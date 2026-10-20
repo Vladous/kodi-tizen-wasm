@@ -81,6 +81,19 @@ if(TARGET_WEBOS)
                       ${WAYLAND_EXTRA_PROTOCOL_GENERATED_DIR}/wayland-webos-protocols.hpp)
 endif()
 
+if(TARGET_TIZEN)
+  set_source_files_properties(${WAYLAND_EXTRA_PROTOCOL_GENERATED_DIR}/wayland-tizen-protocols.cpp
+                              ${WAYLAND_EXTRA_PROTOCOL_GENERATED_DIR}/wayland-tizen-protocols.hpp
+                              PROPERTIES GENERATED TRUE SKIP_LINTING ON)
+
+  list(APPEND SOURCES SeatTizen.cpp
+                      WinSystemWaylandTizen.cpp
+                      ${WAYLAND_EXTRA_PROTOCOL_GENERATED_DIR}/wayland-tizen-protocols.cpp)
+  list(APPEND HEADERS SeatTizen.h
+                      WinSystemWaylandTizen.h
+                      ${WAYLAND_EXTRA_PROTOCOL_GENERATED_DIR}/wayland-tizen-protocols.hpp)
+endif()
+
 core_add_library(windowing_WAYLAND)
 
 if(PC_WAYLAND_PROTOCOLS_VERSION VERSION_GREATER_EQUAL 1.41)

@@ -181,6 +181,14 @@
 #include <emscripten.h>
 #endif
 
+#ifdef TARGET_TIZEN
+#include "platform/linux/tizen/CrashReport.h"
+
+#include <thread>
+
+#include <unistd.h>
+#endif
+
 #include <tinyxml.h>
 
 //TODO: XInitThreads
@@ -1448,7 +1456,12 @@ int CApplication::Run()
   return m_ExitCode; // unreachable
 #else
   while (!m_bStop)
+  {
     RunIteration();
+#if defined(TARGET_TIZEN)
+    SaveSettingsRegularly();
+#endif
+  }
 
   Cleanup();
 
@@ -1484,23 +1497,28 @@ void CApplication::RunIteration()
   }
 }
 
+#if defined(TARGET_WASM) || defined(TARGET_TIZEN)
+void CApplication::SaveSettingsRegularly()
+{
+  // A TV ends the app without letting it shut down, which is when the settings are
+  // saved otherwise.
+  static auto nextSave = std::chrono::steady_clock::now() + 5s;
+  if (std::chrono::steady_clock::now() < nextSave)
+    return;
+  nextSave = std::chrono::steady_clock::now() + 5s;
+  const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
+  if (settings && settings->IsLoaded())
+    settings->Save();
+}
+#endif
+
 #ifdef TARGET_WASM
 void CApplication::WasmRunIteration()
 {
   if (!m_bStop)
   {
     RunIteration();
-
-    // A TV ends the app without letting it shut down, which is when the settings are
-    // saved otherwise.
-    static auto nextSave = std::chrono::steady_clock::now() + 5s;
-    if (std::chrono::steady_clock::now() >= nextSave)
-    {
-      nextSave = std::chrono::steady_clock::now() + 5s;
-      const auto settings = CServiceBroker::GetSettingsComponent()->GetSettings();
-      if (settings && settings->IsLoaded())
-        settings->Save();
-    }
+    SaveSettingsRegularly();
     return;
   }
 
@@ -1707,6 +1725,21 @@ bool CApplication::Stop(int exitCode)
       if (skin)
         skin->SaveSettings();
     }
+
+#if defined(TARGET_TIZEN)
+    // A TV shows a closed app until its process ends, and add-ons that do not stop can
+    // keep Kodi from ending. What is worth keeping has been saved by now.
+    std::thread(
+        [exitCode]
+        {
+          std::this_thread::sleep_for(15s);
+          CLog::Log(LOGWARNING, "Kodi did not end in time, ending it");
+          KODI::PLATFORM::TIZEN::ReportThreads();
+          std::this_thread::sleep_for(1s);
+          _exit(exitCode);
+        })
+        .detach();
+#endif
 
     m_bStop = true;
     // Add this here to keep the same ordering behaviour for now

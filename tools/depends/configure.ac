@@ -310,7 +310,7 @@ case $host in
       use_linker=wasm-ld
     fi
   ;;
-  arm-webos-linux-gnueabi|arm-starfish-linux-gnueabi)
+  arm-webos-linux-gnueabi|arm-starfish-linux-gnueabi|arm-tizen-linux-gnueabi)
     lto_wrap_prefix=gcc-
   ;;
   *darwin*)
@@ -431,6 +431,24 @@ case $host in
     platform_os="linux"
     meson_system="linux"
     target_platform="webos"
+    app_rendersystem="gles"
+  ;;
+  arm-tizen-linux-gnueabi)
+    # Samsung Tizen TVs: ARMv7 with NEON, softfp, glibc 2.30. The toolchain is a GCC
+    # built against the Tizen rootstrap, which is its sysroot.
+    meson_cpu="arm"
+    if test "x$use_cpu" = "xauto"; then
+      use_cpu="armeabi-v7a"
+    fi
+    use_toolchain="${use_toolchain:-/usr}"
+    platform_cppflags="-DPIC -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64"
+    platform_cflags="-fPIC -march=armv7-a -mfpu=neon -mfloat-abi=softfp -mtune=cortex-a53 -Wno-psabi"
+    platform_cxxflags="$platform_cflags -static-libstdc++"
+    optimize_flags="-O2"
+    platform_ldflags="-Wl,-rpath-link=$prefix/$deps_dir/lib -static-libstdc++ -static-libgcc"
+    platform_os="linux"
+    meson_system="linux"
+    target_platform="tizen"
     app_rendersystem="gles"
   ;;
   arm*-*-linux-gnu*|arm*-*-linux-uclibc*|aarch64*-*-linux-gnu*|aarch*-*-linux-be*)
@@ -593,6 +611,8 @@ case $use_platform in
   ios|ios-simulator|tvos|tvos-simulator|macos)
     ;;
   webos)
+    ;;
+  tizen)
     ;;
   wasm)
     ;;

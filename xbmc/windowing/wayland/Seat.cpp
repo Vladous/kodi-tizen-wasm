@@ -147,6 +147,7 @@ void CSeat::HandleKeyboardCapability()
     KODI::UTILS::POSIX::CFileHandle fdGuard{fd};
     KODI::UTILS::POSIX::CMmap mmap{nullptr, size, PROT_READ, MAP_PRIVATE, fd, 0};
     std::string keymap{static_cast<const char*> (mmap.Data()), size};
+    AdjustKeymap(keymap);
     for (auto handler : m_rawKeyboardHandlers)
     {
       handler->OnKeyboardKeymap(this, format, keymap);

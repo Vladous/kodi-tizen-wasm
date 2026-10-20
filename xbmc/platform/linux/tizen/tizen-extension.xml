@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The interfaces of Tizen's tizen-extension.xml (platform/core/uifw/wayland-extension,
+     MIT licensed) that Kodi uses on Samsung TVs. -->
+<protocol name="tizen_extension">
+    <interface name="tizen_surface" version="1">
+    <description summary="tizen-specific surface">
+      The tizen_surface provides tizen-specific functionalities for the given
+      surface.
+    </description>
+
+    <request name="get_tizen_resource">
+      <description summary="get a tizen_resource object">
+        Create a tizen_resource interface for the given surface.
+      </description>
+      <arg name="id" type="new_id" interface="tizen_resource" summary="the new tizen_resource object"/>
+      <arg name="surface" type="object" interface="wl_surface" summary="the surface object"/>
+    </request>
+
+    <request name="destroy" type="destructor">
+      <description summary="destroy tizen_surface">
+        Destroy this tizen_surface object.
+      </description>
+    </request>
+
+  </interface>
+  <interface name="tizen_resource" version="1">
+    <description summary="global resource id">
+      This tizen_resource provides a global resource id. It is a unique id
+      which is provided by the display server.
+    </description>
+
+    <request name="destroy" type="destructor">
+      <description summary="destroy tizen_resource">
+        Destroy this tizen_resource object.
+      </description>
+    </request>
+
+    <event name="resource_id">
+      <description summary="a global resource id">
+        The resource_id event is sent immediately upon the tizen_resource object
+        creation by the display server. The id is a unique id which is generated
+        by the display server.
+      </description>
+      <arg name="id" type="uint" summary="the global resource id"/>
+    </event>
+
+  </interface>
+  <interface name="tizen_keyrouter" version="2">
+    <description summary="an interface to set each focus for each key">
+      In tradition, all the keys in a keyboard and a device on which
+      some keys are attached will be sent to focus surface by default.
+      Currently it's possible to set up each focus for each key in a keyboard and a device.
+      Therefore, by setting a key grab for a surface, the owner of the
+      surface will get the key event when it has the key grab for the key.
+    </description>
+
+    <enum name="error">
+      <entry name="none" value="0" summary="no error"/>
+      <entry name="invalid_surface" value="1" summary="Given surface is invalid."/>
+      <entry name="invalid_key" value="2" summary="Given key is invalid."/>
+      <entry name="invalid_mode" value="3" summary="Given mode is invalid."/>
+      <entry name="grabbed_already" value="4" summary="The key has been grabbed already."/>
+      <entry name="no_permission" value="5" summary="The wl client has no permission to grab the key."/>
+      <entry name="no_system_resources" value="6" summary="System resources are insufficient."/>
+      <entry name="invalid_array" value="7" summary="Given array has invalid pairs or data type."/>
+    </enum>
+
+    <enum name="mode">
+      <description summary="mode for a key grab">
+        This value is used to set a mode for a key grab. With this mode and
+        the order of the surface between surfaces' stack, the compositor will determine the destination client
+        surface.
+      </description>
+      <entry name="none" value="0" summary="none"/>
+      <entry name="shared" value="1"
+       summary="mode to get a key grab with the other client surfaces when the focused client surface gets the key"/>
+      <entry name="topmost" value="2"
+       summary="mode to get a key grab when the client surface is the top most surface"/>
+      <entry name="overridable_exclusive" value="3"
+       summary="mode to get a key grab exclusively, overridably regardless of the order in the surface stack"/>
+      <entry name="exclusive" value="4"
+       summary="mode to get a key grab exclusively regardless of the order in surface stack"/>
+      <entry name="registered" value="5"
+       summary="mode to get a key grab only when a requesting surface is on top among the registering surfaces for the key"/>
+    </enum>
+
+    <enum name="config_mode">
+      <description summary="mode for setting specific property for Key delivery">
+        This value is used to set a mode for a window. With this mode and
+        the order of the surface between surfaces' stack, the compositor will determine the destination client
+        surface.
+      </description>
+      <entry name="none" value="0" summary="none"/>
+      <entry name="invisible_set" value="1"
+       summary="mode to set window to enable send event to invisible window below in stack"/>
+      <entry name="invisible_get" value="2"
+       summary="mode to set window to get event to invisible state if any top window has set register_set"/>
+      <entry name="num_key_focus" value="3"
+          summary="mode to register for num keys for focus window"/>
+      <entry name="picture_off" value="4"
+          summary="mode to set picture off for particular key"/>
+    </enum>
+
+    <request name="set_keygrab">
+      <arg name="surface" type="object" interface="wl_surface" allow-null="true"/>
+      <arg name="key" type="uint"/>
+      <arg name="mode" type="uint"/>
+    </request>
+
+    <request name="unset_keygrab">
+      <arg name="surface" type="object" interface="wl_surface" allow-null="true"/>
+      <arg name="key" type="uint"/>
+    </request>
+
+    <request name="get_keygrab_status">
+      <arg name="surface" type="object" interface="wl_surface" allow-null="true"/>
+      <arg name="key" type="uint"/>
+    </request>
+
+    <request name="set_keygrab_list">
+      <arg name="surface" type="object" interface="wl_surface" allow-null="true"/>
+      <arg name="grab_list" type="array" summary="array of two integer variables pairs each pairs consist of keycode and keygrab mode"/>
+    </request>
+
+    <request name="unset_keygrab_list">
+      <arg name="surface" type="object" interface="wl_surface" allow-null="true"/>
+      <arg name="ungrab_list" type="array" summary="array of integer variables meaning keycode wanted to ungrab"/>
+    </request>
+
+    <request name="get_keygrab_list">
+      <arg name="surface" type="object" interface="wl_surface" allow-null="true"/>
+    </request>
+
+    <request name="set_register_none_key">
+      <arg name="surface" type="object" interface="wl_surface" allow-null="true"/>
+      <arg name="data" type="uint"/>
+    </request>
+
+    <request name="get_keyregister_status">
+      <arg name="data" type="uint"/>
+    </request>
+
+    <request name="set_input_config">
+      <arg name="surface" type="object" interface="wl_surface" allow-null="true"/>
+      <arg name="config_mode" type="uint"/>
+      <arg name="value" type="uint"/>
+    </request>
+
+    <event name="keygrab_notify">
+      <arg name="surface" type="object" interface="wl_surface" allow-null="true"/>
+      <arg name="key" type="uint"/>
+      <arg name="mode" type="uint"/>
+      <arg name="error" type="uint"/>
+    </event>
+
+    <event name="keygrab_notify_list">
+      <arg name="surface" type="object" interface="wl_surface" allow-null="true"/>
+      <arg name="grab_result" type="array" summary="array of three integer variables pairs each pairs consist of keycode, keygrab mode and keygrab result"/>
+    </event>
+
+    <event name="getgrab_notify_list">
+      <arg name="surface" type="object" interface="wl_surface" allow-null="true"/>
+      <arg name="grab_result" type="array" summary="array of two integer variables pairs each pairs consist of keycode, keygrab mode"/>
+    </event>
+
+    <event name="set_register_none_key_notify">
+      <arg name="surface" type="object" interface="wl_surface" allow-null="true"/>
+      <arg name="mode" type="uint"/>
+    </event>
+
+    <event name="keyregister_notify">
+      <arg name="status" type="uint"/>
+    </event>
+
+    <event name="set_input_config_notify">
+      <arg name="status" type="uint"/>
+    </event>
+
+    <event name="key_cancel">
+      <arg name="key" type="uint"/>
+    </event>
+
+    <request name="destroy" type="destructor">
+      <description summary="destroy the tizen_keyrouter">
+        Destroy the tizen_keyrouter.
+      </description>
+    </request>
+    <event name="event_surface" since="2">
+      <arg name="surface" type="object" interface="wl_surface" summary="the surface object"/>
+      <arg name="key" type="uint"/>
+      <arg name="mode" type="uint"/>
+    </event>
+  </interface>
+
+  <!-- tizen_policy and tizen_visibility as far as Kodi uses them: the requests up to
+       uniconify and the events of version 1, in the order of the protocol. -->
+  <interface name="tizen_policy" version="1">
+    <description summary="tizen-specific window policies">
+      Lets a client find out whether its window is visible and bring it to the front.
+    </description>
+
+    <request name="get_visibility">
+      <arg name="id" type="new_id" interface="tizen_visibility"/>
+      <arg name="surface" type="object" interface="wl_surface"/>
+    </request>
+
+    <request name="get_position">
+      <arg name="id" type="new_id" interface="tizen_position"/>
+      <arg name="surface" type="object" interface="wl_surface"/>
+    </request>
+
+    <request name="activate">
+      <arg name="surface" type="object" interface="wl_surface"/>
+    </request>
+
+    <request name="activate_below_by_res_id">
+      <arg name="res_id" type="uint"/>
+      <arg name="below_res_id" type="uint"/>
+    </request>
+
+    <request name="raise">
+      <arg name="surface" type="object" interface="wl_surface"/>
+    </request>
+
+    <request name="lower">
+      <arg name="surface" type="object" interface="wl_surface"/>
+    </request>
+
+    <request name="lower_by_res_id">
+      <arg name="res_id" type="uint"/>
+    </request>
+
+    <request name="set_focus_skip">
+      <arg name="surface" type="object" interface="wl_surface"/>
+    </request>
+
+    <request name="unset_focus_skip">
+      <arg name="surface" type="object" interface="wl_surface"/>
+    </request>
+
+    <request name="set_role">
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="role" type="string"/>
+    </request>
+
+    <request name="set_type">
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="win_type" type="uint"/>
+    </request>
+
+    <request name="set_conformant">
+      <arg name="surface" type="object" interface="wl_surface"/>
+    </request>
+
+    <request name="unset_conformant">
+      <arg name="surface" type="object" interface="wl_surface"/>
+    </request>
+
+    <request name="get_conformant">
+      <arg name="surface" type="object" interface="wl_surface"/>
+    </request>
+
+    <request name="set_notification_level">
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="level" type="int"/>
+    </request>
+
+    <request name="set_transient_for">
+      <arg name="child_id" type="uint"/>
+      <arg name="parent_id" type="uint"/>
+    </request>
+
+    <request name="unset_transient_for">
+      <arg name="child_id" type="uint"/>
+    </request>
+
+    <request name="set_window_screen_mode">
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="mode" type="uint"/>
+    </request>
+
+    <request name="place_subsurface_below_parent">
+      <arg name="subsurface" type="object" interface="wl_subsurface"/>
+    </request>
+
+    <request name="set_subsurface_stand_alone">
+      <arg name="subsurface" type="object" interface="wl_subsurface"/>
+    </request>
+
+    <request name="get_subsurface">
+      <arg name="id" type="new_id" interface="wl_subsurface"/>
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="parent_id" type="uint"/>
+    </request>
+
+    <request name="set_opaque_state">
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="state" type="int"/>
+    </request>
+
+    <request name="iconify">
+      <arg name="surface" type="object" interface="wl_surface"/>
+    </request>
+
+    <request name="uniconify">
+      <arg name="surface" type="object" interface="wl_surface"/>
+    </request>
+
+    <event name="conformant">
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="is_conformant" type="uint"/>
+    </event>
+
+    <event name="conformant_area">
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="conformant_part" type="uint"/>
+      <arg name="state" type="uint"/>
+      <arg name="x" type="int"/>
+      <arg name="y" type="int"/>
+      <arg name="w" type="int"/>
+      <arg name="h" type="int"/>
+    </event>
+
+    <event name="notification_done">
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="level" type="int"/>
+      <arg name="error_state" type="uint"/>
+    </event>
+
+    <event name="transient_for_done">
+      <arg name="child_id" type="uint"/>
+    </event>
+
+    <event name="window_screen_mode_done">
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="mode" type="uint"/>
+      <arg name="error_state" type="uint"/>
+    </event>
+
+    <event name="iconify_state_changed">
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="iconified" type="uint"/>
+      <arg name="force" type="uint"/>
+    </event>
+
+    <event name="supported_aux_hints">
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="hints" type="array"/>
+      <arg name="num_hints" type="uint"/>
+    </event>
+
+    <event name="allowed_aux_hint">
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="id" type="int"/>
+    </event>
+
+    <event name="aux_message">
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="key" type="string"/>
+      <arg name="val" type="string"/>
+      <arg name="options" type="array"/>
+    </event>
+  </interface>
+
+  <interface name="tizen_visibility" version="1">
+    <description summary="visibility of a window">
+      Tells a client how much of its window is visible.
+    </description>
+
+    <enum name="visibility">
+      <entry name="unobscured" value="0"/>
+      <entry name="partially_obscured" value="1"/>
+      <entry name="fully_obscured" value="2"/>
+    </enum>
+
+    <request name="destroy" type="destructor"/>
+
+    <event name="notify">
+      <arg name="visibility" type="uint"/>
+    </event>
+  </interface>
+
+  <interface name="tizen_position" version="1">
+    <description summary="position of a window">
+      Only named by tizen_policy.get_position, which Kodi does not use.
+    </description>
+  </interface>
+</protocol>

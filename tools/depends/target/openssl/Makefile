@@ -6,7 +6,7 @@ DEPS = ../../Makefile.include Makefile OPENSSL-VERSION ../../download-files.incl
 ifeq ($(OS), linux)
   TARGETOPT=--with-zlib-include=$(PREFIX)/include --with-zlib-lib=$(PREFIX)/lib
   CONFIGURE=./Configure no-shared zlib no-tests no-asm no-module  $(TARGETOPT) --prefix=$(PREFIX) --libdir=lib
-  ifeq ($(TARGET_PLATFORM),webos)
+  ifneq (,$(filter webos tizen,$(TARGET_PLATFORM)))
     CONFIGURE+= linux-armv4
     # Need to add "no-async" to avoid "setcontext is not implemented and will always fail" warning
     TARGETOPT+= no-async

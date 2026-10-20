@@ -959,6 +959,10 @@ void CWinSystemWayland::SetResolutionInternal(CSizeInt size,
                  refreshRate, UserFriendlyOutputName(*maxRefreshIt));
     }
   }
+  // Some compositors, such as that of Samsung's TVs, never tell which outputs a surface
+  // is on. It is then on the output of the resolution Kodi asked for.
+  if (refreshRate <= 0.0f)
+    refreshRate = CDisplaySettings::GetInstance().GetCurrentResolutionInfo().fRefreshRate;
 
   m_next.mustBeAcked = mustAck;
   m_next.configureSerial = configureSerial;

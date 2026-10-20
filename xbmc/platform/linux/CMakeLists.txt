@@ -24,6 +24,12 @@ if(TARGET_WEBOS)
                       WebOSTVPlatformConfig.h)
 endif()
 
+if(TARGET_TIZEN)
+  list(APPEND SOURCES tizen/CrashReport.cpp
+                      tizen/TizenEMSS.cpp)
+  list(APPEND HEADERS tizen/CrashReport.h)
+endif()
+
 if(TARGET ${APP_NAME_LC}::Alsa)
   list(APPEND SOURCES FDEventMonitor.cpp)
   list(APPEND HEADERS FDEventMonitor.h)

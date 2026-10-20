@@ -178,6 +178,12 @@ public:
                          std::int32_t hotspotY);
 
 protected:
+  /**
+   * Lets a platform change the keymap of the compositor before it is used, such as
+   * keysym names that xkbcommon does not know
+   */
+  virtual void AdjustKeymap(std::string& keymap) {}
+
   virtual void InstallKeyboardRepeatInfo();
 
 private:

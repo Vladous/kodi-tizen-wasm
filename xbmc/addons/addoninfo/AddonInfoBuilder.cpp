@@ -821,6 +821,15 @@ bool CAddonInfoBuilder::PlatformSupportsAddon(const AddonInfoPtr& addon)
 #endif
 #elif defined(TARGET_FREEBSD)
     "freebsd",
+#elif defined(TARGET_TIZEN)
+    "tizen",
+#if defined(__ARM_ARCH_7A__)
+    "tizen-armv7",
+#elif defined(__aarch64__)
+    "tizen-aarch64",
+#else
+    #warning no architecture dependant platform tag
+#endif
 #elif defined(TARGET_LINUX)
     "linux",
 #if defined(__ARM_ARCH_7A__)
@@ -878,6 +887,13 @@ bool CAddonInfoBuilder::PlatformSupportsAddon(const AddonInfoPtr& addon)
     "wasm",
 #endif
   };
+
+#if defined(TARGET_TIZEN)
+  // Add-ons of other Linux systems that are not binary run on a TV as well. Binary ones
+  // are built for another ABI and C library and must be built for Tizen.
+  if (addon->m_libname.find(".so") == std::string::npos)
+    supportedPlatforms.emplace_back("linux");
+#endif
 
   return std::ranges::find_first_of(addon->m_platforms, supportedPlatforms) !=
          addon->m_platforms.end();

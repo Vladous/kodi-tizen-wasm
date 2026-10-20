@@ -167,8 +167,13 @@ private:
           throw std::runtime_error("poll() signalled error condition on Wayland socket");
         }
 
-        // Read events and release intent; this does not block
-        readIntent.read();
+        // Read events and release intent; this does not block. Reading without data on the
+        // socket would wait for every other thread that intends to read, such as one of
+        // the EGL implementation, which may not wake up for a long time.
+        if (waylandPoll.revents & POLLIN)
+          readIntent.read();
+        else
+          readIntent.cancel();
         // Dispatch default event queue
         m_display.dispatch_pending();
 

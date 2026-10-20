@@ -13,7 +13,10 @@
 #include <unistd.h>
 
 #if defined(HAVE_LINUX_MEMFD)
+// glibc declares memfd_create() and its flags as well, for kernel headers without it
+#if __has_include(<linux/memfd.h>)
 #include <linux/memfd.h>
+#endif
 #include <sys/syscall.h>
 #endif
 

@@ -98,7 +98,7 @@ ifeq ($(findstring apple-darwin, $(HOST)), apple-darwin)
 	cd $(PLATFORM); patch -p1 -i ../06-apple-fix-st_atim.patch
 	cd $(PLATFORM); patch -p1 -i ../07-apple-mknodat-availability.patch
 endif
-ifeq ($(TARGET_PLATFORM),webos)
+ifneq (,$(filter webos tizen,$(TARGET_PLATFORM)))
 	cd $(PLATFORM); patch -p1 -i ../webos-no-readline.patch
 endif
 	cd $(PLATFORM); $(CONFIGURE)

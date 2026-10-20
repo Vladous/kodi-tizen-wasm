@@ -16,6 +16,7 @@
 #include "threads/Thread.h"
 
 #include <memory>
+#include <set>
 #include <vector>
 
 class CPythonInvoker;
@@ -119,6 +120,9 @@ private:
   PyList m_vecPyList;
   PlayerCallbackList m_vecPlayerCallbackList;
   MonitorCallbackList m_vecMonitorCallbackList;
+  // Scripts told to abort, for monitors they create afterwards (guarded by the lock of
+  // m_vecMonitorCallbackList)
+  std::set<long> m_abortedInvokers;
 
   // any global events that scripts should be using
   CEvent m_globalEvent;

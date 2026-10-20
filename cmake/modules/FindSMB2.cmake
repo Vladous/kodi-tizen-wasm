@@ -14,6 +14,7 @@ if(NOT TARGET ${APP_NAME_LC}::${CMAKE_FIND_PACKAGE_NAME})
                    -DENABLE_EXAMPLES=OFF
                    -DENABLE_LIBKRB5=OFF
                    -DENABLE_GSSAPI=OFF
+                   -DENABLE_LIBDCERPC=OFF
                    -DCMAKE_POLICY_VERSION_MINIMUM=3.5)
 
     set(patches "${CORE_SOURCE_DIR}/tools/depends/target/${${CMAKE_FIND_PACKAGE_NAME}_MODULE_LC}/01-emscripten-stdint.patch")

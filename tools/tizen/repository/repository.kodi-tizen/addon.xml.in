@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="repository.kodi-tizen" name="Kodi for Tizen add-ons" version="1.0.0" provider-name="Kodi for Tizen">
+  <extension point="xbmc.addon.repository" name="Kodi for Tizen add-ons">
+    <dir>
+      <info compressed="false">@URL@/addons.xml</info>
+      <checksum>@URL@/addons.xml.md5</checksum>
+      <datadir zip="true">@URL@</datadir>
+    </dir>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Binary add-ons for Kodi on Samsung Tizen TVs</summary>
+    <summary lang="cs_CZ">Binární doplňky pro Kodi na televizích Samsung s Tizenem</summary>
+    <description lang="en_GB">PVR clients, inputstreams and virtual file systems built for the TV's processor and system, which those of other platforms do not run on.</description>
+    <description lang="cs_CZ">PVR klienty, inputstreamy a virtuální souborové systémy sestavené pro procesor a systém televize, na kterých doplňky jiných platforem neběží.</description>
+    <platform>all</platform>
+    <assets>
+      <icon>icon.png</icon>
+    </assets>
+  </extension>
+</addon>

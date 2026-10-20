@@ -27,6 +27,8 @@ if("wayland" IN_LIST CORE_PLATFORM_NAME_LC)
 
   if("webos" IN_LIST CORE_PLATFORM_NAME_LC)
     include(${CMAKE_SOURCE_DIR}/cmake/scripts/webos/ExtraTargets.cmake)
+  elseif("tizen" IN_LIST CORE_PLATFORM_NAME_LC)
+    include(${CMAKE_SOURCE_DIR}/cmake/scripts/tizen/ExtraTargets.cmake)
   endif()
 
   # Dummy target for dependencies
